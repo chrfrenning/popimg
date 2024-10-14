@@ -10,6 +10,16 @@ images = {}
 events = []
 clients = []
 
+@app.route('/wall')
+def wall():
+    images_list = [{'short_id': short_id, 'timestamp': image['timestamp']} for short_id, image in images.items()]
+    print(images_list)
+    # sort the images by timestamp desc
+    images_list = sorted(images_list, key=lambda x: x['timestamp'], reverse=True)
+    # take only the ids
+    images_list = [image['short_id'] for image in images_list]
+    return render_template('wall.html', images=images_list)
+
 @app.route('/events')
 def sse():
     def generate():
@@ -54,7 +64,8 @@ def upload_image(short_id):
     # Store the image in the images dictionary
     images[short_id] = {
         'content_type': content_type,
-        'data': request.data
+        'data': request.data,
+        'timestamp': time.time()
         }
     broadcast_event(short_id)
     return {'location': f'/{short_id}'}, 201
@@ -68,13 +79,19 @@ def delete_image(short_id):
     del images[short_id]
     return '', 204
 
+@app.route('/', methods=['POST'])
+def create_image():
+    return upload_image( shortuuid.uuid() )
+
 @app.route('/', methods=['GET'])
 def home():
-    # create a short id
-    short_id = shortuuid.ShortUUID().random(length=5)
-    # redirect the user to /short_id
-    return redirect(f'/{short_id}')
+    return redirect(f'/{shortuuid.uuid()}')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=port)
+    
+    debug = True
+    if os.environ.get('PWD', '') == '/app':
+        debug = False
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)

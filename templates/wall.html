@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>popimg</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #title {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+        }
+
+        #upload-area {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .image-container {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .image {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .image-link {
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">popimg</h1>
+    <div id="upload-area"></div>
+    <div id="content-area" style="display: flex; flex-flow: row wrap;"></div>
+
+    <script>
+        function showImage(id) {
+            let existingImg = document.getElementById(id);
+
+            if (existingImg) {
+
+                existingImg.src = `/${id}/image?${new Date().getTime()}`;
+
+            } else {
+
+                const imgdiv = document.createElement("div");
+                imgdiv.id = id;
+                imgdiv.className = "image-container";
+
+                const href = document.createElement("a");
+                href.className = "image-link";
+                href.href = `/${id}`;
+
+                let img = document.createElement("img");
+                img.id = id;
+                img.className = "image";
+                img.src = `/${id}/image?${new Date().getTime()}`;
+                img.style.maxHeight = "200px";
+                img.style.maxWidth = "200px";
+
+                href.appendChild(img);
+
+                imgdiv.appendChild(href);
+                //document.getElementById('content-area').appendChild(imgdiv);
+                document.getElementById('content-area').insertBefore(imgdiv, document.getElementById('content-area').firstChild);
+
+            }
+        }
+
+        // add an upload button to select a file, then POST it to the server using multipart/form-data
+        function addUploadButton() {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.multiple = true;
+            
+            input.onchange = function() {
+                for (let i = 0; i < input.files.length; i++) {
+                    const file = input.files[i];
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        fetch(`/`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": file.type
+                            },
+                            body: reader.result
+                        }).then(response => {
+                            if (response.ok) {
+                                console.log("Uploaded the image!");
+                            } else {
+                                console.error("Failed to upload the image!");
+                            }
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+
+                input.value = "";
+            };
+
+            const label = document.createElement("label");
+            label.textContent = "Upload a new photo: ";
+            label.appendChild(input);
+            document.getElementById('upload-area').appendChild(label);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            addUploadButton();
+
+            var server_image_list = JSON.parse('{{ images | tojson | safe }}');
+            for (var i = 0; i < server_image_list.length; i++) {
+                showImage(server_image_list[i]);
+            }
+
+            const evtSource = new EventSource("/events");
+            evtSource.onmessage = function(event) {
+                showImage(event.data)
+            };
+        });
+</script>
+
+</body>
+</html>
