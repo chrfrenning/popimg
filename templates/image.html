@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Image Page</title>
+</head>
+<body>
+    <h1 id="title">No image yet</h1>
+    <img id="image" style="max-height: 500px; max-width: 500px; display: none;">
+
+    <script>
+        function showImage(url) {
+            document.getElementById("image").src = url;
+            document.getElementById("image").style.display = "block";
+            document.getElementById("title").innerText = "Image";
+        }
+
+        {% if has_image %} 
+            showImage("/{{ short_id }}/image");
+        {% endif %}
+
+        const evtSource = new EventSource("/events");
+        evtSource.onmessage = function(event) {
+            if (event.data === "{{ short_id }}") {
+                showImage(`/{{ short_id }}/image?${new Date().getTime()}`)
+                console.log("Updated the image!");
+            }
+        };
+
+        // add an upload button to select a file, then POST it to the server using multipart/form-data
+        const input = document.createElement("input");
+        input.type = "file";
+        input.onchange = function() {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function() {
+                fetch(`/{{ short_id }}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": file.type
+                    },
+                    body: reader.result
+                }).then(response => {
+                    if (response.ok) {
+                        console.log("Uploaded the image!");
+                    } else {
+                        console.error("Failed to upload the image!");
+                    }
+                });
+            };
+
+            reader.readAsArrayBuffer(file);
+        };
+        document.body.appendChild(input);
+</script>
+
+</body>
+</html>
