@@ -59,11 +59,12 @@
             } else {
 
                 const imgdiv = document.createElement("div");
-                imgdiv.id = id;
                 imgdiv.className = "image-container";
+                imgdiv.id = `${id}-div`;
 
                 const href = document.createElement("a");
                 href.className = "image-link";
+                href.id = `${id}-href`;
                 href.href = `/${id}`;
 
                 let img = document.createElement("img");
