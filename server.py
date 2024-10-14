@@ -1,5 +1,6 @@
 import os
 import time
+import queue
 import shortuuid
 from flask import Flask, Response, redirect, request, render_template
 
@@ -7,16 +8,25 @@ app = Flask(__name__)
 
 images = {}
 events = []
+clients = []
 
 @app.route('/events')
 def sse():
     def generate():
-        while True:
-            if events:
-                event = events.pop(0)
+        q = queue.Queue()
+        clients.append(q)
+        try:
+            while True:
+                event = q.get()
                 yield f"data: {event}\n\n"
-            time.sleep(1)
+        except GeneratorExit:
+            clients.remove(q)
+
     return Response(generate(), mimetype='text/event-stream')
+
+def broadcast_event(event):
+    for client in clients:
+        client.put(event)
 
 @app.route('/<short_id>', methods=['GET'])
 def show_image(short_id):
@@ -46,7 +56,7 @@ def upload_image(short_id):
         'content_type': content_type,
         'data': request.data
         }
-    events.append(short_id)
+    broadcast_event(short_id)
     return {'location': f'/{short_id}'}, 201
 
 @app.route('/<short_id>', methods=['DELETE'])
