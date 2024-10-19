@@ -9,6 +9,7 @@ itsdangerous # ==2.1.2
 Jinja2 # ==3.1.1
 MarkupSafe # ==2.1.1
 Werkzeug # ==2.0.3
+flask-cors
 
 # Flask Packages
 # Flask-Login==0.4.0
@@ -33,3 +34,8 @@ marshmallow # ==3.15.0
 azure-storage-blob
 azure-data-tables
 azure-storage-queue
+redis
+
+
+# qr
+qrcode[pil]
