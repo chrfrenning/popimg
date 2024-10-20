@@ -13,8 +13,10 @@ COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 # --extra-index-url https://download.pytorch.org/whl/cpu
 
+COPY static/ /app/static/
 COPY templates/ /app/templates/
-COPY server.py /app/server.py
+COPY favicon.ico /app/favicon.ico
+COPY *.py /app/
 
 WORKDIR /app
 CMD python -m server

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #007BFF;
+            color: #ffffff;
+        }
+        .content {
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f4f4f4;
+            color: #777777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Thank you!</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{ email }},</p>
+            <p>Thank you for upgrading to Premium!</p>
+            <p><a href="{{ wall_link }}">Access Your Wall</a></p>
+
+            <h3>How to use the Automated Photo Booth</h3>
+            <p>The Automated Photo Booth is our most loved feature - and you now have access!</p>
+            <p>For best results, follow these simple steps:</p>
+            <ul>
+                <li>Setup a dedicated space on your event for group photos</li>
+                <li>A neutral background is best, or use a professional backdrop if you can</li>
+                <li>Make sure the lighting is good, using a <a href="https://www.amazon.com/Elgato-Ring-Light-Temperature-app-adjustable/dp/B08GMDQ87T">professional ring light is a good idea</a></li>
+                <li>Use a ring light with a smartphone holder, or get a camera stand with a smartphone holder</li>
+                <li>Use a smartphone with a high quality camera and use landscape mode</li>
+                <li>Open the <a href="{{ booth_link }}">LiveWall Photo Booth App</a> on the smartphone and get going</li>
+                <li>If you don't want AI to snap for you, get a selfie-stick remote, connect it to your smartphone, and use it to take photos</li>
+            </ul>
+
+            <h3>Access to moderation tools</h3>
+            <p>You now have access to our full suite of moderation tools:</p>
+            <p><a href="{{ moderation_link }}">Access the control panel here</a></p>
+
+            <h3>We keep your photos safe</h3>
+            <p>We will store your wall and all photos until {{ expiry }}. You can also download all photos in a ZIP file from your <a href="{{ moderation_link }}">control panel</a> at any time.</p>
+            
+            <p>Best regards,<br>The LiveWall Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Perceptron AS. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

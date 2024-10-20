@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock the Full Experience | LiveWall</title>
+    <style nonce="{{ nonce }}">
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        strong {
+            color: #3498db;
+        }
+    </style>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h2>Unlock the Full Experience</h2>
+
+    {% if was_canceled %}
+    <p style="color: red">Your previous transaction was cancelled. Please try again.</p>
+    {% endif %}
+
+    
+    
+
+
+    <p>For just <strong>$25</strong>, access advanced features that take your event to the next level:</p>
+    {% include 'partials/premium_list.html' %}
+    
+    <div style="text-align: center;">
+        <button id="checkout-button" style="display: inline-block; padding: 15px 30px; background-color: rgb(0, 116, 212); color: white; text-decoration: none; border-radius: 5px; font-size: 18px; border: none; cursor: pointer;">
+            Checkout with Stripe
+        </button>
+    </div>
+
+    <script>
+        var stripe = Stripe('{{ stripe_public_key }}');
+    
+        document.getElementById('checkout-button').addEventListener('click', function () {
+            fetch('/checkout/{{ wall.id }}/{{ wall.owner_key }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    wall_id: '{{ wall.id }}'
+                }),
+                })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({ sessionId: session.id });
+            })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

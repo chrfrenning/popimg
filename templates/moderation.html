@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Center | LiveWall</title>
+    <style>
+        .toggle-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            user-select: none;
+        }
+        .toggle-button.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+
+    
+
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 30px; /* Reduced width by half */
+            height: 17px; /* Reduced height by half */
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 17px; /* Adjusted border-radius */
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 13px; /* Reduced height by half */
+            width: 13px; /* Reduced width by half */
+            left: 2px; /* Adjusted position */
+            bottom: 2px; /* Adjusted position */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(13px); /* Adjusted translation */
+        }
+    </style>
+</head>
+<body>
+    <h1>LiveWall Control Center</h1>
+
+    {% if wall.status.value != 'premium' %}
+        <div 
+            style="background-color: green; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block;"
+            title="Your photos are kept for a week, and you have access to our basic moderation features"
+            >
+            Free Mode
+        </div>
+    {% endif %}
+
+    {% if wall.status.value == 'premium' %}
+        <div 
+            style="background-color: gold; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block;"
+            title="You have access to all our features, thank you for supporting us!"
+            >
+            Premium
+        </div>
+    {% endif %}
+
+    <h3>You now own this wall, {{ wall.owner_email }}!</h3>
+    <p>Keep that email so that you can always return to your wall and your photos.</p>
+
+    <button onclick="openWall()">Open Wall</button>
+    <script>
+        function openWall() {
+            window.location.href = '/w/{{ wall.id }}?k={{ wall.owner_key }}';
+        }
+    </script>
+
+    <p>We will keep all photos for at least a week. Only you, or those you share this link or your email with, can access your wall.</p>
+
+    <h3>Find a big, nice screen to show your wall on</h3>
+    <p>Copy the link below, and open it on a laptop with a projector or gigantic screen</p>
+    <input id="copyLinkBtn" type="button" value="Copy Link" onclick="copyLinkToClipboard()">
+    <a href="{{ wall_link }}">{{ wall_link }}</a>
+    <script>
+        function copyLinkToClipboard() {
+            const el = document.createElement('textarea');
+            el.value = '/w/{{ wall.id }}?k={{ wall.owner_key }}';
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            // change button text to Copied! for 2 seconds
+            storedText = document.getElementById('copyLinkBtn').value;
+            document.getElementById('copyLinkBtn').value = 'Copied!';
+            setTimeout(function() {
+                document.getElementById('copyLinkBtn').value = storedText;
+            }, 2000);
+        }
+    </script>
+    <p>Share it via email or however you want.</p>
+
+    <h3>Enable Wall 
+        <label class="switch">
+            <input type="checkbox" id="manualModerationToggle" checked>
+            <span class="slider round"></span>
+        </label>
+    </h3>
+    <p>Disabling the wall will hide all photos from being shown.</p>
+
+    <h3>Enable Cameras <label class="switch">
+        <input type="checkbox" id="enableCamerasToggle" checked>
+        <span class="slider round"></span>
+    </label></h3>
+    <p>The LiveWall Camera immediately posts to the live wall - for instant fun and sharing.</p>
+    <p>Tell your friends to scan the QR code to access the camera.</p>
+    <p>You can also use the camera if you have a phone or laptop with a camera by clicking the button below.</p>
+    <button onclick="openCamera()">Open Camera</button>
+    <script>
+        function openCamera() {
+            window.location.href = '/camera?w={{ wall.id }}';
+        }
+    </script>
+
+
+    <h3>AI Moderation
+    <label class="switch">
+        <input type="checkbox" id="aiModerationToggle" disabled>
+        <span class="slider round"></span>
+    </label></h3>
+    <p>Automatically filters out inappropriate content (sexual, violence, selfharm).</p>
+    <p><i>AI Moderation is only available on Premium walls.</i></p>
+
+    <script>
+        document.getElementById('aiModerationToggle').addEventListener('change', function() {
+            if (this.checked) {
+                // Enable AI Moderation
+                console.log('AI Moderation Enabled');
+            } else {
+                // Disable AI Moderation
+                console.log('AI Moderation Disabled');
+            }
+        });
+    </script>
+
+
+    <h3>Manual Moderation 
+        <label class="switch">
+            <input type="checkbox" id="manualModerationToggle" disabled>
+            <span class="slider round"></span>
+        </label>
+    </h3>
+    <p>All photos will be queued here until you manually approve them to show on the wall.</p>
+    {% for image in images %}
+        <img src="/i/{{ image.id }}" alt="Moderation Image" style="max-width: 100px; max-height: 100px; margin: 5px;">
+    {% endfor %}
+    <p><i>Moderation is only available on Premium walls.</i></p>
+
+
+    <h3>Save your photos</h3>
+    <p><i>Download all photos is only available for Premium walls. You can still download individual images from the wall.</i></p>
+    <div class="toggle-button">Download all Photos</div>
+
+    
+
+    {% if wall.status.value != 'premium' %}
+    <h3>How about Premium?</h3>
+    <p>You have access to our basic features, and we'll keep your photos for a week, so have fun with LiveWalls.</p>
+    <p>But if you want to support us and get access to all our features, you can upgrade to Premium for some cool features:</p>
+    {% include 'partials/premium_list.html' %}
+
+    <div style="text-align: left; margin-top: 20px;">
+        <a href="/upgrade/{{ wall.id }}/{{ wall.owner_key }}" style="display: inline-block; padding: 15px 30px; background-color: rgb(0, 116, 212); color: white; text-decoration: none; border-radius: 5px; font-size: 18px;">
+            Upgrade to Premium
+        </a>
+    </div>
+    {% endif %}
+
+    <h3>What's included in Free</h3>
+    <p>Free works just fine! It is intended for informal events and fun. Keep the email we sent so you can find back to your wall. Also we'll keep your wall and photos for a week, after that they will be permanently deleted. Feel free to create new walls at any time.</p>
+
+
+    <h3>More than one page?</h3>
+    <p>Use multiple walls in all sorts of creative ways.</p>
+    <p>You can see all your walls and create new by clicking the button below.</p>
+    <button onclick="goToUserPage()">See all your walls</button>
+    <script>
+        function goToUserPage() {
+            window.location.href = '/u/{{ user.id }}/{{ user.validation_code }}';
+        }
+    </script>
+
+
+    <h3>Privacy and legal terms</h3>
+    <p>This service is in Beta, and we have not gotten around to all the fine-print details yet. But this is very simple: We do not share your data with anyone. Everything we store and transfer is encrypted. We do not use cookies. We do not track you. We do not show ads. We do not sell your data. We do not have access to your photos. We do not
+        log anything beyond what is strictly necessary to run the service, and barely that. All logs are deleted after 1 week (it is expensive to keep it around). Hit Delete Wall to remove all traces of your wall and photos from our servers. When you hit Delete, objects immediately become unavailable, and they are permanently purged from our servers within minutes. We are not responsible for anything, and we do not guarantee anything. If you are not happy with our Premium service, just ask via email to hello@livewall.no and we'll provide a no-questions-asked refund. You can delete your own account at any time by using Delete My Account (you must first delete all photos and walls).
+    </p>
+    
+
+
+    <h3>Danger zone</h3>
+    <div class="toggle-button">Delete All Photos</div>
+    <div class="toggle-button">Delete Wall</div>
+
+    <script>
+        document.querySelectorAll('.toggle-button').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

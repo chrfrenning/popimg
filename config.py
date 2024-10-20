@@ -1,0 +1,16 @@
+import os
+
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
+AZURE_COMMS_CS = os.getenv("AZURE_COMMS_CS")
+AZURE_STORAGE_CS = os.getenv("AZURE_STORAGE_CS")
+EMAIL_SENDER_ADDRESS = os.getenv("EMAIL_SENDER_ADDRESS")
+
+STRIPE_SIGNING_SECRET = os.getenv("STRIPE_SIGNING_SECRET")
+STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID")
+
+CONTENT_SAFETY_ENDPOINT = os.getenv("CONTENT_SAFETY_ENDPOINT")
+CONTENT_SAFETY_KEY = os.getenv("CONTENT_SAFETY_KEY")

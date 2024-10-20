@@ -3,6 +3,6 @@ CRU=$(dotenv -f .env get CRU)
 CRP=$(dotenv -f .env get CRP)
 TAG=latest
 
-docker build -t $(dotenv -f .env get CR)/popimg:$TAG .
+docker build -t $(dotenv -f .env get CR)/livewall:$TAG .
 docker login $CR -u $CRU -p $CRP
-docker push $CR/popimg:$TAG
+docker push $CR/livewall:$TAG

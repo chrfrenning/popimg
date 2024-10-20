@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #007BFF;
+            color: #ffffff;
+        }
+        .content {
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f4f4f4;
+            color: #777777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to LiveWall!</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{ email }},</p>
+            <p>Great to have you on LiveWall! Your wall is now safely saved, and you can always access it with the link below:</p>
+            <p><a href="{{ wall_link }}">Access Your Wall</a></p>
+
+            <h3>Access to moderation tools</h3>
+            <p>You now have access to our basic moderation tools:</p>
+            <p><a href="{{ moderation_link }}">Access the control panel here</a></p>
+
+            <h3>You can have multiple walls!</h3>
+            <p>Use multiple walls for big events or various topics! Your imagination is the only limit.</p>
+            <p><a href="{{ user_link }}">Create more and see all your walls here</a></p>
+
+            <h3>Even more with Premium</h3>
+            <p>Upgrade your wall to Premium for $25 and get:</p>
+            {% include 'partials/premium_list.html' %}
+
+            <h3>PS! Keep this email</h3>
+            <p>This email contains the links needed to administer your wall and your account. Keep it safe.</p>
+            
+            <p>Best regards,<br>The LiveWall Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Perceptron AS. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

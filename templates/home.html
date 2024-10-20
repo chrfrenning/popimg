@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveWall - Share Your Moments Instantly</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f8f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #007BFF;
+        }
+        .cta-button {
+            display: block;
+            padding: 15px 25px;
+            margin: 20px auto;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 300px;
+        }
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <img src="/static/logo.webp" alt="LiveWall Logo" style="width: 100%; max-width: 500px; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="container">
+        
+        <h1>Share your moments instantly with a live photo wall</h1>
+        
+        <h2>Capture the Fun, Together</h2>
+        <p>LiveWall turns any event, company trip, or party into a shared experience, instantly showcasing your guests' photos in real time. Simply snap pictures with the camera app and watch them come to life on the photo wall &mdash; instantly, no hassle. Your event just got more exciting.</p>
+        
+        <h2>Get Everyone Involved</h2>
+        <p>At your event, LiveWall lets your guests take pictures, and the photos appear instantly, creating a living, breathing wall of memories. Every smile, every laugh, and every perfect shot &mdash; all shared live with everyone.</p>
+        
+        <h2>Use the LiveWall Camera</h2>
+        <p>Guests use the LiveWall Camera that works on all smartphones &mdash; just snap and share. No need to download anything to join the fun, just scan the QR code on the wall. It's simple, seamless, and perfect for any event.</p>
+        
+        <h2>Bring Your Wall to Life</h2>
+        <p>Start your event with LiveWall and let the memories flow. Whether it's a party, birthday, wedding, company trip, or any celebration, LiveWall makes it easy to share the joy as it happens.</p>
+        <a id="firstCta" href="{{ url_for('start', _external=True)}}" class="cta-button">Create your first wall now</a>
+
+        <h2>Privacy at the Center</h2>
+        <p>In contrast to social media platforms, LiveWall is perfectly private. Users have control of the images they snapped themselves, while only you and fellow moderators have access to all the photos, so you're sure to avoid leaking those embarrassing moments, and also access to download and save them after your event with our Premium package.</p>
+        
+        <h2>Unlock the Full Experience</h2>
+        <p>For just $25, access advanced features that take your event to the next level:</p>
+        {% include 'partials/premium_list.html' %}
+        
+        <h2>Get Started Now</h2>
+        <p>Ready to make your next event unforgettable? Try LiveWall and see how easy sharing can be.</p>
+        <a id="secondCta" href="{{ url_for('start', _external=True)}}" class="cta-button">Try LiveWall Now</a>
+        <p>Bring your moments to life!</p>
+
+        <script>
+            function isIphone() {
+                return /iPhone/i.test(navigator.userAgent);
+            }
+
+            function isAndroid() {
+                return /Android/i.test(navigator.userAgent);
+            }
+
+            if (isIphone() || isAndroid()) {
+
+                var firstCta = document.getElementById('firstCta');
+                var secondCta = document.getElementById('secondCta');
+
+                firstCta.addEventListener('click', function(event) {
+                    // event.preventDefault();
+                    // showEmailForm();
+                });
+
+                secondCta.addEventListener('click', function(event) {
+                    // event.preventDefault();
+                    // showEmailForm();
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

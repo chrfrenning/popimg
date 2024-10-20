@@ -3,25 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>livewall.pics</title>
+    <title>LiveWall | Snap and instantly share photos with your friends</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        #title {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
             background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            margin: 0;
         }
 
-        #upload-area {
+        #scrollable-content {
+            flex: 2;
+            overflow-y: scroll;
+            padding: 20px;
+            margin-right: 180px;
+        }
+
+        #banner {
+            flex: 1;
+            background-color: #8DBFC0;
+            color: darkgray
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 200px;
             text-align: center;
-            padding: 10px;
+            padding: 5px;
+        }
+
+        #logo-image {
+            display: block;
+            margin: 0 auto;
+            max-width: 80%;
+            margin-bottom: 20px;
+        }
+
+        .banner-content {
+            margin-bottom: 20px;
+        }
+
+        #content-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .image-container {
@@ -29,12 +60,14 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #f9f9f9;
+            background-color: #555;
         }
 
         .image {
             display: block;
             margin: 0 auto;
+            max-height: 200px;
+            max-width: 200px;
         }
 
         .image-link {
@@ -42,19 +75,100 @@
             text-align: center;
         }
 
-        .qr-code {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
+        #email-form-container {
+            margin-top: 20px;
+        }
+
+        #email-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #email-input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        #submit-button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #submit-button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .success-icon {
+            color: green;
+            font-size: 2em;
+        }
+
+        #registration-complete {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1 id="title">livewall.pics</h1>
-    <div id="content-area" style="display: flex; flex-flow: row wrap;"></div>
-    <h2>No pictures yet! Scan the QR code on your mobile! (<a href="{{app_url}}" target="_blank">Or go here</a>)</h2>
-    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="qr-code">
+    <div id="scrollable-content">
+        <div id="content-area"></div>
+    </div>
+    <div id="banner">
+        <h3 class="banner-content">https://livewall.no</h3>
+        <img id="logo-image" src="/static/logo.webp">
+        <h2>Open the Camera App!</h2>
+        <p class="banner-content">Scan the QR code below to snap and post photos</p>
+        <div id="qr-code">
+            {{ qr_svg | safe }}
+        </div>
+        <a href="{{camera_url}}" target="_blank">Open Camera</a>
+        <div id="email-form-container" class="banner-content">
+            <div style="background-color: orange; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block;">
+                Temporary Wall
+            </div>
+            <p class="banner-content">Don't loose this wall - take ownership of it now</p>
+
+            <form id="email-form">
+                <input type="email" id="email-input" placeholder="Enter your email" required>
+                <button type="submit" id="submit-button">Submit</button>
+            </form>
+
+            <div>
+                <p>Registering secures your wall and enables basic moderation</p>
+            </div>
+        </div>
+        <div id="registration-complete">
+            <i class="fas fa-check-circle success-icon"></i>
+            <p>Check your email (and spam folder if you dont receive anything within a minute or two)</p>
+        </div>
+
+        {% if wall.status.value != 'new' %}
+        <div id="owner-information">
+            <p>The owner of this wall is {{ wall.owner_email }}</p>
+        </div>
+        {% endif %}
+
+        {% if wall.status.value != 'premium' %}
+        <div style="background-color: green; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block;">
+            Free Mode
+        </div>
+        <div id="premium-information">
+            <p><a href="/upgrade/{{ wall.id }}/{{ wall.owner_key }}">Upgrade to premium for more features</a></p>
+        </div>
+        {% endif %}
+
+        {% if wall.status.value == 'premium' %}
+        <div style="background-color: gold; color: white; padding: 5px 10px; border-radius: 20px; display: inline-block;">
+            Premium
+        </div>
+        {% endif %}
+    </div>
 
     <script>
         function showImage(id, url) {
@@ -62,11 +176,8 @@
             let existingImg = document.getElementById(id);
 
             if (existingImg) {
-
                 existingImg.src = url;
-
             } else {
-
                 const imgdiv = document.createElement("div");
                 imgdiv.className = "image-container";
                 imgdiv.id = `${id}-div`;
@@ -80,35 +191,100 @@
                 img.id = id;
                 img.className = "image";
                 img.src = url;
-                img.style.maxHeight = "200px";
-                img.style.maxWidth = "200px";
 
                 href.appendChild(img);
-
                 imgdiv.appendChild(href);
                 document.getElementById('content-area').insertBefore(imgdiv, document.getElementById('content-area').firstChild);
             }
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-
             var server_image_list = JSON.parse('{{ images | tojson | safe }}');
             for (var i = 0; i < server_image_list.length; i++) {
                 showImage(server_image_list[i].id, server_image_list[i].url);
             }
 
-            const evtSource = new EventSource("/events?w={{ wall_id }}");
+            let evtSource = new EventSource("/events?w={{ wall_id }}");
             evtSource.onmessage = function(event) {
                 console.log(event.data);
                 eventData = JSON.parse(event.data);
                 console.log(eventData.type);
                 if (eventData.type == 'add') {
                     showImage(eventData.id, eventData.url)
-                } 
+                }
+                else if (eventData.type == 'update') {
+                    console.log('update');
+                    if (eventData.url) {
+                        showImage(eventData.id, eventData.url);
+                    } else {
+                        window.location.reload();
+                    }
+                    
+                }
+            };
+            evtSource.onerror = function() {
+                console.error("EventSource failed. Reconnecting...");
+                evtSource.close();
+                setTimeout(function() {
+                    evtSource = new EventSource("/events?w={{ wall_id }}");
+                }, 3000); // Reconnect after 3 seconds
             };
 
-        });
-</script>
+            // remove the rect from the qr code
+            const qrRect = document.querySelector('#qr-code rect');
+            if (qrRect) {
+                qrRect.remove();
+            }
 
+            // only show email registration if status is new
+            const status = '{{ wall.status.value }}';
+            if (status !== 'new') {
+                const emailFormContainer = document.getElementById("email-form-container");
+                emailFormContainer.style.display = 'none';
+            }
+        });
+
+        document.getElementById("email-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById("email-input");
+            const submitButton = document.getElementById("submit-button");
+
+            submitButton.disabled = true;
+
+            // get ownerKey from query string k key
+            const ownerKey = new URLSearchParams(window.location.search).get('k');
+
+            const data = { 
+                email: emailInput.value
+            };
+
+            wallUrl = window.location.href;
+            console.log(wallUrl);
+
+            fetch(wallUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Owner-Key': ownerKey
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.ok) {
+                    const emailFormContainer = document.getElementById("email-form-container");
+                    emailFormContainer.style.display = 'none';
+
+                    const registrationComplete = document.getElementById("registration-complete");
+                    registrationComplete.style.display = 'block';
+                } else {
+                    submitButton.disabled = false;
+                    alert('Failed to save email. Please try again.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                submitButton.disabled = false;
+                alert('An error occurred. Please try again.');
+            });
+        });
+    </script>
 </body>
 </html>
