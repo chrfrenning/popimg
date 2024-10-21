@@ -147,10 +147,10 @@ def upload_image(wall_id):
         'owner_key': image.owner_key
         }, 201
 
-@app.route('/i/<id>', methods=['DELETE'])
-def delete_image(short_id):
+@app.route('/i/<image_id>', methods=['DELETE'])
+def delete_image(image_id):
     # Get the image
-    image = images.get(short_id, None)
+    image = ImageDataLayer().get_by_id(image_id)
     if image is None:
         return '', 404
     # get the owner key from the request
@@ -158,14 +158,13 @@ def delete_image(short_id):
     # check that the owner key matches
     if owner_key != image.owner_key:
         # check that the owner key matches the wall
-        wall = walls.get(image.wall_id, None)
+        wall = WallDataLayer().get_by_id(image.wall_id)
         if wall is None or owner_key != wall.owner_key:
             return '', 403
     # remove the image from its wall
-    wall = walls[image.wall_id]
-    wall.image_ids.remove(short_id)
-    # delete the image
-    del images[short_id]
+    ImageDataLayer().delete(image)
+    # delete the image from the blob storage
+    BlobService().delete_image(image_id)
     # broadcast the event
     broadcast_event(Event(EventType.DELETE, image, wall.id))
     return '', 204

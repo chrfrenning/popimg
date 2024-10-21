@@ -118,7 +118,10 @@ class BlobService:
     
     def get_image(self, image_id, container_name = ORIGINALS_CONTAINER_NAME):
         return self._download_bytes_from_blob(container_name, image_id)
-    
+
+    def delete_image(self, image_id, container_name = ORIGINALS_CONTAINER_NAME):
+        return self._delete_blob(container_name, image_id)
+
 class ModerationService:
     def __init__(self, endpoint = CONTENT_SAFETY_ENDPOINT, key = CONTENT_SAFETY_KEY):
         self.endpoint = endpoint
